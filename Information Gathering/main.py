@@ -40,10 +40,6 @@ print('Folder is Ready!!!')
 
 print("-" * 50)
 
-print('We will start Nmap scan')
-
-print("-" * 50)
-
 ip = get_ip_address(link)
 
 print("-" * 50)
@@ -53,14 +49,18 @@ print("-" * 50)
 
 x = int(input('Starting Port : '))
 y = int(input('Ending Port : '))
+print("-" * 50)
 try:
-    for port in range(x, y):
+    for port in range(x, y+1):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket.setdefaulttimeout(1)
         result = s.connect_ex((ip,port))
         if result ==0:
             print("Port {} is open".format(port))
+        else:
+            print("Port {} is close".format(port))
         s.close()
+
 except KeyboardInterrupt:
         print("\n Exiting Program !!!!")
         sys.exit()
