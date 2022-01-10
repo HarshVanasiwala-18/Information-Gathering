@@ -8,6 +8,7 @@ import sys
 import socket
 from datetime import datetime
 from urllib.parse import urlparse
+import re
 
 ROOT_DIR = 'Info_gather'
 create_dir(ROOT_DIR)
@@ -38,7 +39,7 @@ def main():
         link = input('Enter link (https) : ')
         if link != url:
             sys.exit()
-            
+
     print("-" * 50)
 
     name = input('Enter the name : ')
@@ -58,30 +59,32 @@ def main():
     print("Scanning started at:" + str(datetime.now()))
     print("-" * 50)
 
-    x = int(input('Starting Port : '))
-    y = int(input('Ending Port : '))
+    port_range_pattern = re.compile("([0-9]+)-([0-9]+)")
+    port_min = 0
+    port_max = 65535
+    open_ports = []
 
-    try:
-        for port in range(x, y+1):
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            socket.setdefaulttimeout(1)
-            result = s.connect_ex((ip,port))
-            if result ==0:
-                print("Port {} is open".format(port))
-            else:
-                print("Port {} is close".format(port))
-            s.close()
-
-    except KeyboardInterrupt:
-            print("\n Exiting Program !!!!")
-            sys.exit()
-    except socket.gaierror:
-            print("\n Hostname Could Not Be Resolved !!!!")
-            sys.exit()
-    except socket.error:
-            print("\ Server not responding !!!!")
-            sys.exit()
-
+    while True:   
+        print("Please enter the range of ports you want to scan in format: <int>-<int> (ex would be 60-120)")
+        port_range = input("Enter port range: ")
+        port_range_valid = port_range_pattern.search(port_range.replace(" ",""))
+        if port_range_valid:
+            port_min = int(port_range_valid.group(1))
+            port_max = int(port_range_valid.group(2))
+            break   
+    
+    for port in range(port_min, port_max + 1):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:        
+                s.settimeout(1)
+                s.connect((ip, port))
+                open_ports.append(port)
+        except:
+            pass 
+    
+    for port in open_ports:
+        print("Port {} is open on {}.".format(port, ip))
+    
     print("-" * 50)
 
     ans = str(input("DNS Exploration (Y/N) : "))
