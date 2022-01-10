@@ -7,6 +7,7 @@ from Dns_exploration import *
 import sys
 import socket
 from datetime import datetime
+from urllib.parse import urlparse
 
 ROOT_DIR = 'Info_gather'
 create_dir(ROOT_DIR)
@@ -28,7 +29,16 @@ def create_report(name, full_url, domain_name, robots_txt, who_is):
     
 def main():    
     link = input('Enter link (https) : ')
-
+    parser = urlparse(link)
+    url = 'https://' + parser.netloc
+    if link != url:
+        print('Please enter a valid link')
+        print(url)
+        print("-" * 50)
+        link = input('Enter link (https) : ')
+        if link != url:
+            sys.exit()
+            
     print("-" * 50)
 
     name = input('Enter the name : ')
